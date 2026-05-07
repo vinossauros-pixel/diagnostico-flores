@@ -300,8 +300,10 @@
 
 <script>
   // ============= CONFIG =============
-  // Cole aqui a URL do Apps Script depois de publicar (veja COMO-CONFIGURAR.md)
-  const WEBHOOK_URL = "COLE_AQUI_A_URL_DO_APPS_SCRIPT";
+  // Endpoint do FormSubmit — entrega no e-mail vinossauros@gmail.com.
+  // Primeira submissão dispara um e-mail de confirmação que precisa ser aceito 1x.
+  const FORM_ENDPOINT = "https://formsubmit.co/vinossauros@gmail.com";
+  const SUCCESS_URL = window.location.origin + window.location.pathname + "?ok=1";
 
   // ============= NAVEGAÇÃO ENTRE MODOS =============
   const opcoes = document.getElementById('opcoes');
@@ -434,6 +436,12 @@
     return ok;
   };
 
+  // ============= HELPERS =============
+  const dataUrlParaFile = async (dataUrl, nome) => {
+    const blob = await (await fetch(dataUrl)).blob();
+    return new File([blob], nome, { type: blob.type || 'image/jpeg' });
+  };
+
   // ============= ENVIO =============
   document.getElementById('form-envio').addEventListener('submit', async e => {
     e.preventDefault();
@@ -451,30 +459,30 @@
     btn.disabled = true;
     btn.textContent = 'Enviando...';
 
-    const dados = {
-      nome: document.getElementById('nome').value.trim(),
-      whatsapp: document.getElementById('whatsapp').value.trim(),
-      descricao: document.getElementById('descricao').value.trim(),
-      imagem: fotoDataUrl,
-      data: new Date().toISOString(),
-    };
-
     try{
-      if(WEBHOOK_URL && WEBHOOK_URL.startsWith('http')){
-        const r = await fetch(WEBHOOK_URL, {
-          method:'POST',
-          headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: JSON.stringify(dados),
-        });
-        const txt = await r.text();
-        let resp;
-        try{ resp = JSON.parse(txt); }catch(_){ resp = {ok: r.ok}; }
-        if(!resp.ok && !r.ok) throw new Error(resp.error || 'Falha no envio');
-      }else{
-        // Sem webhook configurado: salva localmente como fallback
-        console.warn('WEBHOOK_URL não configurado — apenas simulando envio');
-        await new Promise(r=>setTimeout(r,1200));
-      }
+      const nome = document.getElementById('nome').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+      const descricao = document.getElementById('descricao').value.trim();
+
+      const file = await dataUrlParaFile(
+        fotoDataUrl,
+        `flor-${Date.now()}.jpg`
+      );
+
+      const fd = new FormData();
+      fd.append('Nome', nome);
+      fd.append('WhatsApp', whatsapp);
+      fd.append('Descricao', descricao || '(não informado)');
+      fd.append('Data', new Date().toLocaleString('pt-BR', {timeZone:'America/Sao_Paulo'}));
+      fd.append('attachment', file, file.name);
+      fd.append('_subject', `🌹 Nova foto de flor — ${nome}`);
+      fd.append('_template', 'table');
+      fd.append('_captcha', 'false');
+      fd.append('_next', SUCCESS_URL);
+
+      const r = await fetch(FORM_ENDPOINT, { method:'POST', body: fd });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+
       document.getElementById('sucesso').classList.add('ativo');
     }catch(err){
       erroEl.textContent = 'Não conseguimos enviar agora. Tente novamente em instantes. ('+err.message+')';
@@ -492,6 +500,12 @@
     document.getElementById('btn-enviar').textContent = '📤 Enviar para análise';
     mostrar('opcoes');
   });
+
+  // Se voltou da confirmação do FormSubmit, mostra sucesso
+  if(window.location.search.includes('ok=1')){
+    document.getElementById('sucesso').classList.add('ativo');
+    history.replaceState({}, '', window.location.pathname);
+  }
 </script>
 </body>
 </html>
