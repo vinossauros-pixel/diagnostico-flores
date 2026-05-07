@@ -145,21 +145,6 @@
   .passos .num{width:28px;height:28px;border-radius:50%;background:var(--rosa-claro);color:var(--rosa-escuro);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
   .passos b{font-weight:600}
 
-  /* MODAL CÂMERA */
-  .cam-overlay{display:none;position:fixed;inset:0;background:#000;z-index:200;flex-direction:column}
-  .cam-overlay.ativo{display:flex}
-  .cam-header{background:rgba(0,0,0,.7);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;backdrop-filter:blur(10px)}
-  .cam-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
-  .cam-fechar:hover{background:rgba(255,255,255,.25)}
-  .cam-video-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-  .cam-video{width:100%;height:100%;object-fit:cover}
-  .cam-dica{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;background:rgba(0,0,0,.6);padding:8px 16px;border-radius:20px;white-space:nowrap;text-align:center}
-  .cam-controles{background:#000;padding:24px;display:flex;align-items:center;justify-content:center;gap:30px}
-  .cam-trocar{background:rgba(255,255,255,.15);border:none;color:#fff;width:48px;height:48px;border-radius:50%;font-size:22px;cursor:pointer;font-family:inherit}
-  .cam-capturar{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:transparent;cursor:pointer;padding:4px;transition:transform .1s}
-  .cam-capturar:active{transform:scale(.92)}
-  .cam-capturar div{width:100%;height:100%;border-radius:50%;background:#fff}
-
   /* SUCESSO */
   .sucesso-overlay{display:none;position:fixed;inset:0;background:rgba(45,27,46,.6);z-index:100;align-items:center;justify-content:center;padding:20px}
   .sucesso-overlay.ativo{display:flex}
@@ -271,23 +256,6 @@
 
 </main>
 
-<!-- MODAL CÂMERA -->
-<div class="cam-overlay" id="cam-overlay">
-  <div class="cam-header">
-    <span>Fotografe a flor</span>
-    <button type="button" class="cam-fechar" id="cam-fechar" aria-label="Fechar">×</button>
-  </div>
-  <div class="cam-video-wrap">
-    <video class="cam-video" id="cam-video" autoplay playsinline muted></video>
-    <div class="cam-dica">Aproxime da flor e toque no botão branco</div>
-  </div>
-  <div class="cam-controles">
-    <button type="button" class="cam-trocar" id="cam-trocar" aria-label="Trocar câmera">🔄</button>
-    <button type="button" class="cam-capturar" id="cam-capturar" aria-label="Tirar foto"><div></div></button>
-    <div style="width:48px"></div>
-  </div>
-</div>
-
 <!-- SUCESSO -->
 <div class="sucesso-overlay" id="sucesso">
   <div class="sucesso-card">
@@ -318,68 +286,10 @@
     fotoPreview.classList.toggle('ativo', quem==='foto');
   };
 
-  // ============= CÂMERA AO VIVO =============
-  const camOverlay = document.getElementById('cam-overlay');
-  const camVideo = document.getElementById('cam-video');
-  let camStream = null;
-  let camFacing = 'environment';
-
-  const camIniciar = async () => {
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      inputCamera.click();
-      return;
-    }
-    try{
-      camStream = await navigator.mediaDevices.getUserMedia({
-        video:{ facingMode: camFacing, width:{ideal:1920}, height:{ideal:1080} },
-        audio:false
-      });
-      camVideo.srcObject = camStream;
-      camOverlay.classList.add('ativo');
-    }catch(err){
-      console.warn('Câmera ao vivo indisponível, abrindo input nativo:', err.message);
-      inputCamera.click();
-    }
-  };
-
-  const camParar = () => {
-    if(camStream){
-      camStream.getTracks().forEach(t => t.stop());
-      camStream = null;
-    }
-    camVideo.srcObject = null;
-    camOverlay.classList.remove('ativo');
-  };
-
-  const camCapturar = () => {
-    if(!camVideo.videoWidth) return;
-    const canvas = document.createElement('canvas');
-    canvas.width = camVideo.videoWidth;
-    canvas.height = camVideo.videoHeight;
-    canvas.getContext('2d').drawImage(camVideo, 0, 0);
-    fotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    document.getElementById('foto-img').src = fotoDataUrl;
-    camParar();
-    mostrar('foto');
-  };
-
-  const camTrocar = async () => {
-    camFacing = camFacing === 'environment' ? 'user' : 'environment';
-    if(camStream){
-      camStream.getTracks().forEach(t => t.stop());
-      try{
-        camStream = await navigator.mediaDevices.getUserMedia({
-          video:{ facingMode: camFacing }, audio:false
-        });
-        camVideo.srcObject = camStream;
-      }catch(_){}
-    }
-  };
-
-  document.getElementById('cam-fechar').addEventListener('click', camParar);
-  document.getElementById('cam-capturar').addEventListener('click', camCapturar);
-  document.getElementById('cam-trocar').addEventListener('click', camTrocar);
-  document.getElementById('btn-camera').addEventListener('click', camIniciar);
+  // ============= ABRIR CÂMERA / GALERIA =============
+  // Usar input nativo é o mais confiável: no celular abre a câmera do sistema
+  // (capture="environment"); no desktop, abre o seletor de arquivos.
+  document.getElementById('btn-camera').addEventListener('click', () => inputCamera.click());
   document.getElementById('btn-galeria').addEventListener('click', () => inputGaleria.click());
   document.getElementById('voltar-foto').addEventListener('click', () => {
     inputCamera.value = '';
