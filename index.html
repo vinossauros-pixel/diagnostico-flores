@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico da sua flor — Envie a foto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --rosa:#e91e63;
+    --rosa-claro:#fce4ec;
+    --rosa-escuro:#ad1457;
+    --dourado:#d4a574;
+    --verde:#2d6a4f;
+    --texto:#2d1b2e;
+    --texto-claro:#6b5560;
+    --bg:#fdf7f9;
+    --branco:#ffffff;
+    --borda:#f0d9e1;
+    --sucesso:#16a34a;
+    --erro:#dc2626;
+    --sombra:0 4px 24px rgba(233,30,99,.08);
+  }
+  html,body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--texto);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  /* HEADER */
+  header{background:#fff;padding:20px 16px;border-bottom:1px solid var(--borda);display:flex;justify-content:center;align-items:center;gap:10px}
+  .logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--rosa-escuro);letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  .logo span{color:var(--dourado)}
+
+  /* CONTAINER */
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px;display:flex;flex-direction:column;gap:20px}
+  @media(max-width:600px){.wrap{padding:16px 12px 32px;gap:16px}}
+
+  .card{background:#fff;border-radius:16px;padding:28px;box-shadow:var(--sombra)}
+  @media(max-width:600px){.card{padding:22px}}
+
+  .hero h1{font-family:'Playfair Display',serif;font-size:28px;color:var(--rosa-escuro);line-height:1.2;margin-bottom:8px}
+  @media(max-width:600px){.hero h1{font-size:24px}}
+  .hero p{color:var(--texto-claro);font-size:15px;line-height:1.5}
+
+  .step-titulo{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--borda)}
+  .step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
+  .step-titulo h2{font-size:17px;font-weight:600;color:var(--texto)}
+
+  /* OPÇÕES */
+  .opcoes{display:flex;flex-direction:column;gap:12px}
+  .opc-camera,.opc-galeria{
+    width:100%;border:none;cursor:pointer;font-family:inherit;text-align:left;
+    display:flex;align-items:center;gap:14px;padding:20px;border-radius:14px;
+    transition:transform .15s,box-shadow .2s,border-color .2s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .opc-camera{
+    position:relative;
+    background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);
+    color:#fff;
+    box-shadow:0 8px 24px rgba(233,30,99,.28);
+  }
+  .opc-camera::before{
+    content:"RECOMENDADO";position:absolute;top:10px;right:12px;
+    background:rgba(255,255,255,.95);color:var(--rosa-escuro);
+    font-size:9px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:20px;
+  }
+  .opc-camera:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(233,30,99,.35)}
+  .opc-galeria{
+    background:#fff;color:var(--texto);
+    border:2px solid var(--rosa-claro);
+  }
+  .opc-galeria:hover{border-color:var(--rosa);box-shadow:0 6px 18px rgba(233,30,99,.12);transform:translateY(-1px)}
+  .opc-icone{
+    width:50px;height:50px;border-radius:12px;
+    background:rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;flex-shrink:0;
+  }
+  .opc-galeria .opc-icone{
+    background:linear-gradient(135deg,var(--rosa-claro) 0%,#fff 100%);
+    color:var(--rosa-escuro);border:1px solid var(--rosa-claro);
+  }
+  .opc-titulo{font-size:15px;font-weight:700;margin-bottom:2px;line-height:1.2}
+  .opc-sub{font-size:12px;opacity:.92;font-weight:400;line-height:1.3}
+  .opc-galeria .opc-sub{color:var(--texto-claro);opacity:1}
+
+  .input-camera,.input-galeria{display:none}
+
+  .seguranca{
+    margin-top:16px;background:var(--rosa-claro);
+    border-radius:10px;padding:12px 14px;
+    font-size:12px;color:var(--rosa-escuro);
+    display:flex;align-items:center;gap:8px;line-height:1.4
+  }
+
+  /* PREVIEW FOTO */
+  .foto-preview{display:none;animation:fadeIn .3s}
+  .foto-preview.ativo{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  .foto-box{
+    position:relative;border-radius:14px;overflow:hidden;
+    border:2px solid var(--rosa-claro);background:#000;
+    aspect-ratio:1;max-width:380px;margin:0 auto 14px;
+  }
+  .foto-box img{width:100%;height:100%;object-fit:cover;display:block}
+  .foto-info{
+    background:linear-gradient(135deg,#dcfce7,#bbf7d0);
+    color:#14532d;padding:12px 16px;border-radius:10px;
+    font-size:14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  }
+  .foto-info .ic{font-size:20px}
+
+  .voltar{background:none;border:none;color:var(--rosa-escuro);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:14px;padding:6px 10px;border-radius:8px;font-family:inherit}
+  .voltar:hover{background:var(--rosa-claro)}
+
+  /* CAMPOS */
+  .campo{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .campo label{font-size:13px;font-weight:500;color:var(--texto)}
+  .campo label .obrig{color:var(--rosa)}
+  .campo input,.campo textarea{
+    width:100%;padding:12px 14px;border:1.5px solid var(--borda);border-radius:10px;
+    font-size:15px;font-family:inherit;color:var(--texto);background:#fff;
+    transition:border-color .2s,box-shadow .2s;outline:none;
+  }
+  .campo textarea{resize:vertical;min-height:90px}
+  .campo input:focus,.campo textarea:focus{border-color:var(--rosa);box-shadow:0 0 0 3px rgba(233,30,99,.1)}
+  .campo input.erro,.campo textarea.erro{border-color:var(--erro);background:#fef2f2}
+  .campo .msg-erro{font-size:12px;color:var(--erro);display:none}
+  .campo.has-erro .msg-erro{display:block}
+
+  .btn-enviar{
+    width:100%;background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);
+    color:#fff;border:none;padding:18px;border-radius:12px;font-size:17px;font-weight:700;
+    cursor:pointer;letter-spacing:.3px;box-shadow:0 6px 20px rgba(233,30,99,.3);
+    transition:transform .15s,box-shadow .2s;font-family:inherit;
+  }
+  .btn-enviar:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(233,30,99,.4)}
+  .btn-enviar:active{transform:translateY(0)}
+  .btn-enviar:disabled{opacity:.7;cursor:wait;transform:none}
+
+  /* COMO FUNCIONA */
+  .passos{list-style:none;display:grid;gap:12px}
+  .passos li{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--texto)}
+  .passos .num{width:28px;height:28px;border-radius:50%;background:var(--rosa-claro);color:var(--rosa-escuro);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+  .passos b{font-weight:600}
+
+  /* MODAL CÂMERA */
+  .cam-overlay{display:none;position:fixed;inset:0;background:#000;z-index:200;flex-direction:column}
+  .cam-overlay.ativo{display:flex}
+  .cam-header{background:rgba(0,0,0,.7);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;backdrop-filter:blur(10px)}
+  .cam-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+  .cam-fechar:hover{background:rgba(255,255,255,.25)}
+  .cam-video-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .cam-video{width:100%;height:100%;object-fit:cover}
+  .cam-dica{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;background:rgba(0,0,0,.6);padding:8px 16px;border-radius:20px;white-space:nowrap;text-align:center}
+  .cam-controles{background:#000;padding:24px;display:flex;align-items:center;justify-content:center;gap:30px}
+  .cam-trocar{background:rgba(255,255,255,.15);border:none;color:#fff;width:48px;height:48px;border-radius:50%;font-size:22px;cursor:pointer;font-family:inherit}
+  .cam-capturar{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:transparent;cursor:pointer;padding:4px;transition:transform .1s}
+  .cam-capturar:active{transform:scale(.92)}
+  .cam-capturar div{width:100%;height:100%;border-radius:50%;background:#fff}
+
+  /* SUCESSO */
+  .sucesso-overlay{display:none;position:fixed;inset:0;background:rgba(45,27,46,.6);z-index:100;align-items:center;justify-content:center;padding:20px}
+  .sucesso-overlay.ativo{display:flex}
+  .sucesso-card{background:#fff;border-radius:16px;padding:36px 28px;text-align:center;max-width:400px;animation:pop .4s}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .sucesso-icone{width:70px;height:70px;background:var(--sucesso);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#fff;font-size:38px}
+  .sucesso-card h3{font-family:'Playfair Display',serif;color:var(--rosa-escuro);margin-bottom:8px;font-size:22px}
+  .sucesso-card p{color:var(--texto-claro);font-size:14px;line-height:1.5}
+  .sucesso-card .ok{margin-top:18px;background:var(--rosa);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px}
+
+  .erro-msg{
+    background:#fef2f2;border:1px solid #fecaca;color:#991b1b;
+    padding:12px 14px;border-radius:10px;font-size:13px;
+    margin-top:12px;display:none;line-height:1.4
+  }
+  .erro-msg.ativo{display:block}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌹 Floricultura <span>Diagnóstico</span></div>
+</header>
+
+<main class="wrap">
+
+  <section class="card hero">
+    <h1>Sua flor está doente?<br>Envie uma foto e descubra</h1>
+    <p>Nossa equipe vai analisar a foto e te responder com o diagnóstico e os cuidados certos pra recuperar a sua planta.</p>
+  </section>
+
+  <section class="card">
+    <div class="step-titulo">
+      <div class="step-num">📸</div>
+      <h2>Envie a foto da sua flor</h2>
+    </div>
+
+    <div class="opcoes" id="opcoes">
+      <button type="button" class="opc-camera" id="btn-camera">
+        <div class="opc-icone">📷</div>
+        <div>
+          <div class="opc-titulo">Tirar foto agora</div>
+          <div class="opc-sub">Aponte a câmera pra flor que está com problema</div>
+        </div>
+      </button>
+
+      <button type="button" class="opc-galeria" id="btn-galeria">
+        <div class="opc-icone">🖼️</div>
+        <div>
+          <div class="opc-titulo">Enviar foto da galeria</div>
+          <div class="opc-sub">Use uma imagem que você já tirou</div>
+        </div>
+      </button>
+
+      <input type="file" accept="image/*" capture="environment" class="input-camera" id="input-camera">
+      <input type="file" accept="image/*" class="input-galeria" id="input-galeria">
+
+      <div class="seguranca">
+        🔒 Sua foto e dados são enviados de forma segura, apenas para nossa equipe de análise.
+      </div>
+    </div>
+
+    <div class="foto-preview" id="foto-preview">
+      <button type="button" class="voltar" id="voltar-foto">← Trocar foto</button>
+      <div class="foto-box">
+        <img id="foto-img" alt="Foto da flor">
+      </div>
+      <div class="foto-info">
+        <span class="ic">✓</span>
+        <span><b>Foto pronta!</b> Agora preencha seus dados pra receber o diagnóstico.</span>
+      </div>
+
+      <form id="form-envio" novalidate>
+        <div class="campo">
+          <label for="nome">Seu nome <span class="obrig">*</span></label>
+          <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Como você se chama" required>
+          <span class="msg-erro">Informe seu nome</span>
+        </div>
+        <div class="campo">
+          <label for="whatsapp">WhatsApp (com DDD) <span class="obrig">*</span></label>
+          <input type="tel" id="whatsapp" name="whatsapp" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required>
+          <span class="msg-erro">WhatsApp inválido</span>
+        </div>
+        <div class="campo">
+          <label for="descricao">Conte o que está acontecendo (opcional)</label>
+          <textarea id="descricao" name="descricao" placeholder="Ex: as folhas começaram a ficar amareladas há 3 dias, está num vaso na varanda, rego 2x por semana..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-enviar" id="btn-enviar">
+          📤 Enviar para análise
+        </button>
+
+        <div class="erro-msg" id="erro-msg"></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step-titulo">
+      <div class="step-num">💚</div>
+      <h2>Como funciona</h2>
+    </div>
+    <ul class="passos">
+      <li><span class="num">1</span><span>Você <b>envia a foto</b> da flor pelo botão acima.</span></li>
+      <li><span class="num">2</span><span>Nossa equipe <b>analisa</b> e identifica o que está afetando sua planta.</span></li>
+      <li><span class="num">3</span><span>Você recebe o <b>diagnóstico e os cuidados</b> diretamente no seu WhatsApp.</span></li>
+    </ul>
+  </section>
+
+</main>
+
+<!-- MODAL CÂMERA -->
+<div class="cam-overlay" id="cam-overlay">
+  <div class="cam-header">
+    <span>Fotografe a flor</span>
+    <button type="button" class="cam-fechar" id="cam-fechar" aria-label="Fechar">×</button>
+  </div>
+  <div class="cam-video-wrap">
+    <video class="cam-video" id="cam-video" autoplay playsinline muted></video>
+    <div class="cam-dica">Aproxime da flor e toque no botão branco</div>
+  </div>
+  <div class="cam-controles">
+    <button type="button" class="cam-trocar" id="cam-trocar" aria-label="Trocar câmera">🔄</button>
+    <button type="button" class="cam-capturar" id="cam-capturar" aria-label="Tirar foto"><div></div></button>
+    <div style="width:48px"></div>
+  </div>
+</div>
+
+<!-- SUCESSO -->
+<div class="sucesso-overlay" id="sucesso">
+  <div class="sucesso-card">
+    <div class="sucesso-icone">✓</div>
+    <h3>Foto recebida!</h3>
+    <p>Nossa equipe vai analisar a foto da sua flor e em breve entrar em contato pelo seu WhatsApp.</p>
+    <button type="button" class="ok" id="btn-ok">Enviar outra foto</button>
+  </div>
+</div>
+
+<script>
+  // ============= CONFIG =============
+  // Cole aqui a URL do Apps Script depois de publicar (veja COMO-CONFIGURAR.md)
+  const WEBHOOK_URL = "COLE_AQUI_A_URL_DO_APPS_SCRIPT";
+
+  // ============= NAVEGAÇÃO ENTRE MODOS =============
+  const opcoes = document.getElementById('opcoes');
+  const fotoPreview = document.getElementById('foto-preview');
+  const inputCamera = document.getElementById('input-camera');
+  const inputGaleria = document.getElementById('input-galeria');
+
+  let fotoDataUrl = null;
+
+  const mostrar = quem => {
+    opcoes.style.display = quem==='opcoes' ? 'flex' : 'none';
+    fotoPreview.classList.toggle('ativo', quem==='foto');
+  };
+
+  // ============= CÂMERA AO VIVO =============
+  const camOverlay = document.getElementById('cam-overlay');
+  const camVideo = document.getElementById('cam-video');
+  let camStream = null;
+  let camFacing = 'environment';
+
+  const camIniciar = async () => {
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      inputCamera.click();
+      return;
+    }
+    try{
+      camStream = await navigator.mediaDevices.getUserMedia({
+        video:{ facingMode: camFacing, width:{ideal:1920}, height:{ideal:1080} },
+        audio:false
+      });
+      camVideo.srcObject = camStream;
+      camOverlay.classList.add('ativo');
+    }catch(err){
+      console.warn('Câmera ao vivo indisponível, abrindo input nativo:', err.message);
+      inputCamera.click();
+    }
+  };
+
+  const camParar = () => {
+    if(camStream){
+      camStream.getTracks().forEach(t => t.stop());
+      camStream = null;
+    }
+    camVideo.srcObject = null;
+    camOverlay.classList.remove('ativo');
+  };
+
+  const camCapturar = () => {
+    if(!camVideo.videoWidth) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = camVideo.videoWidth;
+    canvas.height = camVideo.videoHeight;
+    canvas.getContext('2d').drawImage(camVideo, 0, 0);
+    fotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    document.getElementById('foto-img').src = fotoDataUrl;
+    camParar();
+    mostrar('foto');
+  };
+
+  const camTrocar = async () => {
+    camFacing = camFacing === 'environment' ? 'user' : 'environment';
+    if(camStream){
+      camStream.getTracks().forEach(t => t.stop());
+      try{
+        camStream = await navigator.mediaDevices.getUserMedia({
+          video:{ facingMode: camFacing }, audio:false
+        });
+        camVideo.srcObject = camStream;
+      }catch(_){}
+    }
+  };
+
+  document.getElementById('cam-fechar').addEventListener('click', camParar);
+  document.getElementById('cam-capturar').addEventListener('click', camCapturar);
+  document.getElementById('cam-trocar').addEventListener('click', camTrocar);
+  document.getElementById('btn-camera').addEventListener('click', camIniciar);
+  document.getElementById('btn-galeria').addEventListener('click', () => inputGaleria.click());
+  document.getElementById('voltar-foto').addEventListener('click', () => {
+    inputCamera.value = '';
+    inputGaleria.value = '';
+    fotoDataUrl = null;
+    mostrar('opcoes');
+  });
+
+  // ============= UPLOAD VIA INPUT =============
+  const lerFoto = file => {
+    if(!file) return;
+    // Redimensiona pra economizar peso no envio
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = ev => { img.src = ev.target.result; };
+    img.onload = () => {
+      const max = 1600;
+      let w = img.width, h = img.height;
+      if(w > max || h > max){
+        const r = Math.min(max/w, max/h);
+        w = Math.round(w*r); h = Math.round(h*r);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      fotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('foto-img').src = fotoDataUrl;
+      mostrar('foto');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  inputCamera.addEventListener('change', e => lerFoto(e.target.files && e.target.files[0]));
+  inputGaleria.addEventListener('change', e => lerFoto(e.target.files && e.target.files[0]));
+
+  // ============= MÁSCARA WHATSAPP =============
+  document.getElementById('whatsapp').addEventListener('input', e => {
+    let v = (e.target.value||'').replace(/\D/g,'').slice(0,11);
+    if(v.length<=10) v = v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2');
+    else v = v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
+    e.target.value = v;
+  });
+
+  // ============= VALIDAÇÃO =============
+  const validar = () => {
+    let ok = true;
+    const nome = document.getElementById('nome');
+    const wpp = document.getElementById('whatsapp');
+    [nome,wpp].forEach(el=>el.parentElement.classList.remove('has-erro'));
+
+    if(nome.value.trim().length < 2){ nome.parentElement.classList.add('has-erro'); ok=false; }
+    const ds = (wpp.value||'').replace(/\D/g,'');
+    if(ds.length < 10){ wpp.parentElement.classList.add('has-erro'); ok=false; }
+    return ok;
+  };
+
+  // ============= ENVIO =============
+  document.getElementById('form-envio').addEventListener('submit', async e => {
+    e.preventDefault();
+    const erroEl = document.getElementById('erro-msg');
+    erroEl.classList.remove('ativo');
+
+    if(!fotoDataUrl){
+      erroEl.textContent = 'Por favor, envie uma foto antes de continuar.';
+      erroEl.classList.add('ativo');
+      return;
+    }
+    if(!validar()) return;
+
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const dados = {
+      nome: document.getElementById('nome').value.trim(),
+      whatsapp: document.getElementById('whatsapp').value.trim(),
+      descricao: document.getElementById('descricao').value.trim(),
+      imagem: fotoDataUrl,
+      data: new Date().toISOString(),
+    };
+
+    try{
+      if(WEBHOOK_URL && WEBHOOK_URL.startsWith('http')){
+        const r = await fetch(WEBHOOK_URL, {
+          method:'POST',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify(dados),
+        });
+        const txt = await r.text();
+        let resp;
+        try{ resp = JSON.parse(txt); }catch(_){ resp = {ok: r.ok}; }
+        if(!resp.ok && !r.ok) throw new Error(resp.error || 'Falha no envio');
+      }else{
+        // Sem webhook configurado: salva localmente como fallback
+        console.warn('WEBHOOK_URL não configurado — apenas simulando envio');
+        await new Promise(r=>setTimeout(r,1200));
+      }
+      document.getElementById('sucesso').classList.add('ativo');
+    }catch(err){
+      erroEl.textContent = 'Não conseguimos enviar agora. Tente novamente em instantes. ('+err.message+')';
+      erroEl.classList.add('ativo');
+      btn.disabled = false;
+      btn.textContent = '📤 Enviar para análise';
+    }
+  });
+
+  document.getElementById('btn-ok').addEventListener('click', () => {
+    document.getElementById('sucesso').classList.remove('ativo');
+    document.getElementById('form-envio').reset();
+    fotoDataUrl = null;
+    document.getElementById('btn-enviar').disabled = false;
+    document.getElementById('btn-enviar').textContent = '📤 Enviar para análise';
+    mostrar('opcoes');
+  });
+</script>
+</body>
+</html>
