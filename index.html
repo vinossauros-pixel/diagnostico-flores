@@ -107,7 +107,17 @@
   }
   .trocar:hover{color:var(--rosa)}
 
-  .input-hidden{display:none}
+  .input-hidden{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+    opacity:0;
+    pointer-events:none;
+  }
 
   .dica-foto{
     background:var(--rosa-claro);border-radius:10px;padding:12px 14px;
@@ -200,8 +210,8 @@
           <span class="foto-status">OBRIGATÓRIA</span>
         </div>
         <div class="foto-empty" id="empty-frente">
-          <button type="button" class="mini-btn cam" data-tipo="frente" data-acao="camera">📷 Tirar foto</button>
-          <button type="button" class="mini-btn gal" data-tipo="frente" data-acao="galeria">🖼️ Galeria</button>
+          <label class="mini-btn cam" for="cam-frente">📷 Tirar foto</label>
+          <label class="mini-btn gal" for="gal-frente">🖼️ Galeria</label>
         </div>
         <div class="foto-filled" id="filled-frente" hidden>
           <img class="foto-thumb" id="img-frente" alt="Foto da frente">
@@ -221,8 +231,8 @@
           <span class="foto-status">OBRIGATÓRIA</span>
         </div>
         <div class="foto-empty" id="empty-verso">
-          <button type="button" class="mini-btn cam" data-tipo="verso" data-acao="camera">📷 Tirar foto</button>
-          <button type="button" class="mini-btn gal" data-tipo="verso" data-acao="galeria">🖼️ Galeria</button>
+          <label class="mini-btn cam" for="cam-verso">📷 Tirar foto</label>
+          <label class="mini-btn gal" for="gal-verso">🖼️ Galeria</label>
         </div>
         <div class="foto-filled" id="filled-verso" hidden>
           <img class="foto-thumb" id="img-verso" alt="Foto do verso">
@@ -333,16 +343,7 @@
     reader.readAsDataURL(file);
   };
 
-  // ============= EVENTOS DOS BOTÕES =============
-  document.querySelectorAll('.mini-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tipo = btn.dataset.tipo;
-      const acao = btn.dataset.acao;
-      const id = (acao === 'camera' ? 'cam-' : 'gal-') + tipo;
-      document.getElementById(id).click();
-    });
-  });
-
+  // ============= TROCAR FOTO =============
   document.querySelectorAll('.trocar').forEach(btn => {
     btn.addEventListener('click', () => {
       const tipo = btn.dataset.tipo;
