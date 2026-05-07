@@ -171,6 +171,23 @@
   .passos .num{width:28px;height:28px;border-radius:50%;background:var(--rosa-claro);color:var(--rosa-escuro);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
   .passos b{font-weight:600}
 
+  /* MODAL CÂMERA (webcam no desktop) */
+  .cam-overlay{display:none;position:fixed;inset:0;background:#000;z-index:200;flex-direction:column}
+  .cam-overlay.ativo{display:flex}
+  .cam-header{background:rgba(0,0,0,.85);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600}
+  .cam-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:22px;cursor:pointer;font-family:inherit;line-height:1}
+  .cam-fechar:hover{background:rgba(255,255,255,.25)}
+  .cam-corpo{flex:1;display:flex;align-items:center;justify-content:center;background:#111;overflow:hidden;position:relative}
+  .cam-video{max-width:100%;max-height:100%}
+  .cam-erro{color:#fff;text-align:center;padding:40px 24px;max-width:420px;line-height:1.6}
+  .cam-erro b{display:block;margin-bottom:8px;font-size:16px}
+  .cam-erro p{font-size:14px;opacity:.85;margin-bottom:8px}
+  .cam-rodape{background:#000;padding:22px;display:flex;justify-content:center;align-items:center;gap:20px}
+  .cam-shot{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:transparent;cursor:pointer;padding:4px;transition:transform .1s;font-family:inherit}
+  .cam-shot:active{transform:scale(.92)}
+  .cam-shot div{width:100%;height:100%;border-radius:50%;background:#fff}
+  .cam-shot:disabled{opacity:.4;cursor:not-allowed}
+
   /* SUCESSO */
   .sucesso-overlay{display:none;position:fixed;inset:0;background:rgba(45,27,46,.6);z-index:100;align-items:center;justify-content:center;padding:20px}
   .sucesso-overlay.ativo{display:flex}
@@ -293,6 +310,20 @@
 
 </main>
 
+<!-- MODAL CÂMERA -->
+<div class="cam-overlay" id="cam-overlay">
+  <div class="cam-header">
+    <span id="cam-titulo">Tirar foto</span>
+    <button type="button" class="cam-fechar" id="cam-fechar" aria-label="Fechar">×</button>
+  </div>
+  <div class="cam-corpo" id="cam-corpo">
+    <video class="cam-video" id="cam-video" autoplay playsinline muted></video>
+  </div>
+  <div class="cam-rodape" id="cam-rodape">
+    <button type="button" class="cam-shot" id="cam-shot" disabled aria-label="Tirar foto"><div></div></button>
+  </div>
+</div>
+
 <!-- SUCESSO -->
 <div class="sucesso-overlay" id="sucesso">
   <div class="sucesso-card">
@@ -342,6 +373,97 @@
     };
     reader.readAsDataURL(file);
   };
+
+  // ============= WEBCAM (desktop) =============
+  // Em celular, o <label> abre direto a câmera nativa do sistema (funciona sem JS).
+  // No desktop, capture="environment" é ignorado e abre seletor de arquivos. Aqui
+  // interceptamos o clique no desktop pra abrir a webcam via getUserMedia.
+  const ehMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const temGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  const camOverlay = document.getElementById('cam-overlay');
+  const camCorpo = document.getElementById('cam-corpo');
+  const camRodape = document.getElementById('cam-rodape');
+  const camTitulo = document.getElementById('cam-titulo');
+  let camStream = null;
+  let camTipoAtual = null;
+
+  const camCorpoOriginal = '<video class="cam-video" id="cam-video" autoplay playsinline muted></video>';
+  const camRodapeOriginal = '<button type="button" class="cam-shot" id="cam-shot" disabled aria-label="Tirar foto"><div></div></button>';
+
+  const camFechar = () => {
+    if(camStream){ camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+    camOverlay.classList.remove('ativo');
+    camTipoAtual = null;
+  };
+
+  const camMostrarErro = (titulo, mensagem) => {
+    camCorpo.innerHTML = `
+      <div class="cam-erro">
+        <b>${titulo}</b>
+        <p>${mensagem}</p>
+        <p style="margin-top:14px">Você pode usar o botão <b>Galeria</b> pra anexar uma foto que já tem no computador.</p>
+      </div>`;
+    camRodape.innerHTML = '';
+  };
+
+  const camAbrir = async tipo => {
+    camTipoAtual = tipo;
+    camTitulo.textContent = `Tirar foto da ${tipo}`;
+    camCorpo.innerHTML = camCorpoOriginal;
+    camRodape.innerHTML = camRodapeOriginal;
+    camOverlay.classList.add('ativo');
+
+    const video = document.getElementById('cam-video');
+    const shot = document.getElementById('cam-shot');
+
+    shot.addEventListener('click', () => {
+      if(!video.videoWidth) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      canvas.toBlob(blob => {
+        const file = new File([blob], `webcam-${Date.now()}.jpg`, {type:'image/jpeg'});
+        lerFoto(file, camTipoAtual);
+        camFechar();
+      }, 'image/jpeg', 0.9);
+    });
+
+    try{
+      // facingMode com "ideal" é só preferência — se não tiver câmera traseira (caso típico de notebook), usa qualquer webcam
+      camStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false
+      });
+      video.srcObject = camStream;
+      video.onloadedmetadata = () => { shot.disabled = false; };
+    }catch(err){
+      console.warn('Webcam falhou:', err.name, err.message);
+      if(err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'){
+        camMostrarErro('Permissão de câmera negada', 'Você precisa autorizar o acesso à câmera nas permissões do navegador (cadeado ao lado da URL).');
+      }else if(err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError'){
+        camMostrarErro('Nenhuma câmera encontrada', 'Não detectamos uma webcam neste computador.');
+      }else if(err.name === 'NotReadableError'){
+        camMostrarErro('Câmera ocupada', 'Outro programa (Zoom, Meet, etc.) está usando sua câmera. Feche e tente de novo.');
+      }else{
+        camMostrarErro('Não foi possível abrir a câmera', err.message || 'Erro desconhecido');
+      }
+    }
+  };
+
+  document.getElementById('cam-fechar').addEventListener('click', camFechar);
+
+  // No desktop, intercepta o clique no label "Tirar foto" e abre a webcam
+  if(!ehMobile && temGetUserMedia){
+    document.querySelectorAll('label.mini-btn.cam').forEach(label => {
+      label.addEventListener('click', e => {
+        e.preventDefault();
+        const tipo = label.getAttribute('for').replace('cam-', '');
+        camAbrir(tipo);
+      });
+    });
+  }
 
   // ============= TROCAR FOTO =============
   document.querySelectorAll('.trocar').forEach(btn => {
