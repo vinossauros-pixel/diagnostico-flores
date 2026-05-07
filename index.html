@@ -14,7 +14,6 @@
     --rosa-claro:#fce4ec;
     --rosa-escuro:#ad1457;
     --dourado:#d4a574;
-    --verde:#2d6a4f;
     --texto:#2d1b2e;
     --texto-claro:#6b5560;
     --bg:#fdf7f9;
@@ -26,93 +25,95 @@
   }
   html,body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--texto);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
 
-  /* HEADER */
   header{background:#fff;padding:20px 16px;border-bottom:1px solid var(--borda);display:flex;justify-content:center;align-items:center;gap:10px}
   .logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--rosa-escuro);letter-spacing:.5px;display:flex;align-items:center;gap:8px}
   .logo span{color:var(--dourado)}
 
-  /* CONTAINER */
   .wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px;display:flex;flex-direction:column;gap:20px}
   @media(max-width:600px){.wrap{padding:16px 12px 32px;gap:16px}}
 
   .card{background:#fff;border-radius:16px;padding:28px;box-shadow:var(--sombra)}
-  @media(max-width:600px){.card{padding:22px}}
+  @media(max-width:600px){.card{padding:22px 18px}}
 
   .hero h1{font-family:'Playfair Display',serif;font-size:28px;color:var(--rosa-escuro);line-height:1.2;margin-bottom:8px}
   @media(max-width:600px){.hero h1{font-size:24px}}
   .hero p{color:var(--texto-claro);font-size:15px;line-height:1.5}
 
-  .step-titulo{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--borda)}
-  .step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
+  .step-titulo{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--borda)}
+  .step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
   .step-titulo h2{font-size:17px;font-weight:600;color:var(--texto)}
 
-  /* OPÇÕES */
-  .opcoes{display:flex;flex-direction:column;gap:12px}
-  .opc-camera,.opc-galeria{
-    width:100%;border:none;cursor:pointer;font-family:inherit;text-align:left;
-    display:flex;align-items:center;gap:14px;padding:20px;border-radius:14px;
-    transition:transform .15s,box-shadow .2s,border-color .2s;
+  /* SLOTS DE FOTO */
+  .foto-grid{display:grid;gap:14px;margin-bottom:14px}
+
+  .foto-slot{
+    border:2px dashed var(--borda);border-radius:14px;
+    padding:16px;background:var(--bg);
+    transition:border-color .2s,background .2s;
+  }
+  .foto-slot.preenchido{
+    border-style:solid;border-color:var(--sucesso);
+    background:linear-gradient(135deg,#f0fdf4,#fff);
+  }
+  .foto-titulo{
+    display:flex;align-items:center;gap:8px;
+    font-size:14px;font-weight:600;color:var(--texto);
+    margin-bottom:12px;
+  }
+  .foto-emoji{font-size:18px}
+  .foto-status{
+    margin-left:auto;font-size:11px;font-weight:700;
+    padding:3px 9px;border-radius:20px;letter-spacing:.5px;
+    background:var(--rosa-claro);color:var(--rosa-escuro);
+  }
+  .foto-slot.preenchido .foto-status{
+    background:#dcfce7;color:#15803d;
+  }
+
+  .foto-empty{display:flex;gap:10px}
+  @media(max-width:380px){.foto-empty{flex-direction:column}}
+  .mini-btn{
+    flex:1;border:none;cursor:pointer;font-family:inherit;
+    padding:12px 14px;border-radius:10px;font-size:13px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:transform .12s,box-shadow .2s,border-color .2s;
     -webkit-tap-highlight-color:transparent;
   }
-  .opc-camera{
-    position:relative;
+  .mini-btn.cam{
     background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);
-    color:#fff;
-    box-shadow:0 8px 24px rgba(233,30,99,.28);
+    color:#fff;box-shadow:0 4px 12px rgba(233,30,99,.25);
   }
-  .opc-camera::before{
-    content:"RECOMENDADO";position:absolute;top:10px;right:12px;
-    background:rgba(255,255,255,.95);color:var(--rosa-escuro);
-    font-size:9px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:20px;
-  }
-  .opc-camera:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(233,30,99,.35)}
-  .opc-galeria{
+  .mini-btn.cam:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(233,30,99,.35)}
+  .mini-btn.gal{
     background:#fff;color:var(--texto);
-    border:2px solid var(--rosa-claro);
+    border:1.5px solid var(--rosa-claro);
   }
-  .opc-galeria:hover{border-color:var(--rosa);box-shadow:0 6px 18px rgba(233,30,99,.12);transform:translateY(-1px)}
-  .opc-icone{
-    width:50px;height:50px;border-radius:12px;
-    background:rgba(255,255,255,.18);
-    display:flex;align-items:center;justify-content:center;
-    font-size:26px;flex-shrink:0;
-  }
-  .opc-galeria .opc-icone{
-    background:linear-gradient(135deg,var(--rosa-claro) 0%,#fff 100%);
-    color:var(--rosa-escuro);border:1px solid var(--rosa-claro);
-  }
-  .opc-titulo{font-size:15px;font-weight:700;margin-bottom:2px;line-height:1.2}
-  .opc-sub{font-size:12px;opacity:.92;font-weight:400;line-height:1.3}
-  .opc-galeria .opc-sub{color:var(--texto-claro);opacity:1}
+  .mini-btn.gal:hover{border-color:var(--rosa);color:var(--rosa-escuro)}
 
-  .input-camera,.input-galeria{display:none}
-
-  .seguranca{
-    margin-top:16px;background:var(--rosa-claro);
-    border-radius:10px;padding:12px 14px;
-    font-size:12px;color:var(--rosa-escuro);
-    display:flex;align-items:center;gap:8px;line-height:1.4
+  .foto-filled{display:flex;gap:14px;align-items:center}
+  .foto-thumb{
+    width:88px;height:88px;border-radius:10px;
+    object-fit:cover;border:2px solid var(--sucesso);
+    flex-shrink:0;
   }
-
-  /* PREVIEW FOTO */
-  .foto-preview{display:none;animation:fadeIn .3s}
-  .foto-preview.ativo{display:block}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-  .foto-box{
-    position:relative;border-radius:14px;overflow:hidden;
-    border:2px solid var(--rosa-claro);background:#000;
-    aspect-ratio:1;max-width:380px;margin:0 auto 14px;
+  .foto-acoes{flex:1;display:flex;flex-direction:column;gap:6px}
+  .foto-acoes .info{font-size:13px;color:#15803d;font-weight:600}
+  .foto-acoes .info::before{content:"✓ ";font-weight:700}
+  .trocar{
+    background:none;border:none;color:var(--rosa-escuro);
+    font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+    text-align:left;padding:0;text-decoration:underline;text-underline-offset:3px;
+    align-self:flex-start;
   }
-  .foto-box img{width:100%;height:100%;object-fit:cover;display:block}
-  .foto-info{
-    background:linear-gradient(135deg,#dcfce7,#bbf7d0);
-    color:#14532d;padding:12px 16px;border-radius:10px;
-    font-size:14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;
-  }
-  .foto-info .ic{font-size:20px}
+  .trocar:hover{color:var(--rosa)}
 
-  .voltar{background:none;border:none;color:var(--rosa-escuro);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:14px;padding:6px 10px;border-radius:8px;font-family:inherit}
-  .voltar:hover{background:var(--rosa-claro)}
+  .input-hidden{display:none}
+
+  .dica-foto{
+    background:var(--rosa-claro);border-radius:10px;padding:12px 14px;
+    font-size:12px;color:var(--rosa-escuro);line-height:1.5;
+    margin-bottom:18px;
+  }
 
   /* CAMPOS */
   .campo{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
@@ -133,11 +134,26 @@
     width:100%;background:linear-gradient(135deg,var(--rosa) 0%,var(--rosa-escuro) 100%);
     color:#fff;border:none;padding:18px;border-radius:12px;font-size:17px;font-weight:700;
     cursor:pointer;letter-spacing:.3px;box-shadow:0 6px 20px rgba(233,30,99,.3);
-    transition:transform .15s,box-shadow .2s;font-family:inherit;
+    transition:transform .15s,box-shadow .2s,opacity .2s;font-family:inherit;
+    margin-top:6px;
   }
-  .btn-enviar:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(233,30,99,.4)}
+  .btn-enviar:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 26px rgba(233,30,99,.4)}
   .btn-enviar:active{transform:translateY(0)}
-  .btn-enviar:disabled{opacity:.7;cursor:wait;transform:none}
+  .btn-enviar:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+  .erro-msg{
+    background:#fef2f2;border:1px solid #fecaca;color:#991b1b;
+    padding:12px 14px;border-radius:10px;font-size:13px;
+    margin-top:12px;display:none;line-height:1.4
+  }
+  .erro-msg.ativo{display:block}
+
+  .seguranca{
+    margin-top:16px;background:var(--rosa-claro);
+    border-radius:10px;padding:12px 14px;
+    font-size:12px;color:var(--rosa-escuro);
+    display:flex;align-items:center;gap:8px;line-height:1.4
+  }
 
   /* COMO FUNCIONA */
   .passos{list-style:none;display:grid;gap:12px}
@@ -154,13 +170,6 @@
   .sucesso-card h3{font-family:'Playfair Display',serif;color:var(--rosa-escuro);margin-bottom:8px;font-size:22px}
   .sucesso-card p{color:var(--texto-claro);font-size:14px;line-height:1.5}
   .sucesso-card .ok{margin-top:18px;background:var(--rosa);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px}
-
-  .erro-msg{
-    background:#fef2f2;border:1px solid #fecaca;color:#991b1b;
-    padding:12px 14px;border-radius:10px;font-size:13px;
-    margin-top:12px;display:none;line-height:1.4
-  }
-  .erro-msg.ativo{display:block}
 </style>
 </head>
 <body>
@@ -172,74 +181,92 @@
 <main class="wrap">
 
   <section class="card hero">
-    <h1>Sua flor está doente?<br>Envie uma foto e descubra</h1>
-    <p>Nossa equipe vai analisar a foto e te responder com o diagnóstico e os cuidados certos pra recuperar a sua planta.</p>
+    <h1>Sua flor está doente?<br>Envie 2 fotos e descubra</h1>
+    <p>Nossa equipe vai analisar as fotos e te responder com o diagnóstico e os cuidados certos pra recuperar a sua planta.</p>
   </section>
 
   <section class="card">
     <div class="step-titulo">
       <div class="step-num">📸</div>
-      <h2>Envie a foto da sua flor</h2>
+      <h2>Envie as 2 fotos da sua flor</h2>
     </div>
 
-    <div class="opcoes" id="opcoes">
-      <button type="button" class="opc-camera" id="btn-camera">
-        <div class="opc-icone">📷</div>
-        <div>
-          <div class="opc-titulo">Tirar foto agora</div>
-          <div class="opc-sub">Aponte a câmera pra flor que está com problema</div>
+    <div class="foto-grid">
+
+      <!-- SLOT FRENTE -->
+      <div class="foto-slot" id="slot-frente">
+        <div class="foto-titulo">
+          <span class="foto-emoji">🌹</span> Foto da <b>frente</b>
+          <span class="foto-status">OBRIGATÓRIA</span>
         </div>
+        <div class="foto-empty" id="empty-frente">
+          <button type="button" class="mini-btn cam" data-tipo="frente" data-acao="camera">📷 Tirar foto</button>
+          <button type="button" class="mini-btn gal" data-tipo="frente" data-acao="galeria">🖼️ Galeria</button>
+        </div>
+        <div class="foto-filled" id="filled-frente" hidden>
+          <img class="foto-thumb" id="img-frente" alt="Foto da frente">
+          <div class="foto-acoes">
+            <span class="info">Foto da frente OK</span>
+            <button type="button" class="trocar" data-tipo="frente">Trocar foto</button>
+          </div>
+        </div>
+        <input type="file" accept="image/*" capture="environment" class="input-hidden" id="cam-frente">
+        <input type="file" accept="image/*" class="input-hidden" id="gal-frente">
+      </div>
+
+      <!-- SLOT VERSO -->
+      <div class="foto-slot" id="slot-verso">
+        <div class="foto-titulo">
+          <span class="foto-emoji">🍃</span> Foto do <b>verso</b>
+          <span class="foto-status">OBRIGATÓRIA</span>
+        </div>
+        <div class="foto-empty" id="empty-verso">
+          <button type="button" class="mini-btn cam" data-tipo="verso" data-acao="camera">📷 Tirar foto</button>
+          <button type="button" class="mini-btn gal" data-tipo="verso" data-acao="galeria">🖼️ Galeria</button>
+        </div>
+        <div class="foto-filled" id="filled-verso" hidden>
+          <img class="foto-thumb" id="img-verso" alt="Foto do verso">
+          <div class="foto-acoes">
+            <span class="info">Foto do verso OK</span>
+            <button type="button" class="trocar" data-tipo="verso">Trocar foto</button>
+          </div>
+        </div>
+        <input type="file" accept="image/*" capture="environment" class="input-hidden" id="cam-verso">
+        <input type="file" accept="image/*" class="input-hidden" id="gal-verso">
+      </div>
+
+    </div>
+
+    <div class="dica-foto">
+      💡 A foto do <b>verso</b> (atrás das folhas) ajuda a identificar pragas, ácaros e fungos que costumam se esconder ali.
+    </div>
+
+    <form id="form-envio" novalidate>
+      <div class="campo">
+        <label for="nome">Seu nome <span class="obrig">*</span></label>
+        <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Como você se chama" required>
+        <span class="msg-erro">Informe seu nome</span>
+      </div>
+      <div class="campo">
+        <label for="whatsapp">WhatsApp (com DDD) <span class="obrig">*</span></label>
+        <input type="tel" id="whatsapp" name="whatsapp" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required>
+        <span class="msg-erro">WhatsApp inválido</span>
+      </div>
+      <div class="campo">
+        <label for="descricao">Conte o que está acontecendo (opcional)</label>
+        <textarea id="descricao" name="descricao" placeholder="Ex: as folhas começaram a ficar amareladas há 3 dias, está num vaso na varanda, rego 2x por semana..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-enviar" id="btn-enviar" disabled>
+        📤 Enviar para análise
       </button>
 
-      <button type="button" class="opc-galeria" id="btn-galeria">
-        <div class="opc-icone">🖼️</div>
-        <div>
-          <div class="opc-titulo">Enviar foto da galeria</div>
-          <div class="opc-sub">Use uma imagem que você já tirou</div>
-        </div>
-      </button>
-
-      <input type="file" accept="image/*" capture="environment" class="input-camera" id="input-camera">
-      <input type="file" accept="image/*" class="input-galeria" id="input-galeria">
+      <div class="erro-msg" id="erro-msg"></div>
 
       <div class="seguranca">
         🔒 Sua foto e dados são enviados de forma segura, apenas para nossa equipe de análise.
       </div>
-    </div>
-
-    <div class="foto-preview" id="foto-preview">
-      <button type="button" class="voltar" id="voltar-foto">← Trocar foto</button>
-      <div class="foto-box">
-        <img id="foto-img" alt="Foto da flor">
-      </div>
-      <div class="foto-info">
-        <span class="ic">✓</span>
-        <span><b>Foto pronta!</b> Agora preencha seus dados pra receber o diagnóstico.</span>
-      </div>
-
-      <form id="form-envio" novalidate>
-        <div class="campo">
-          <label for="nome">Seu nome <span class="obrig">*</span></label>
-          <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Como você se chama" required>
-          <span class="msg-erro">Informe seu nome</span>
-        </div>
-        <div class="campo">
-          <label for="whatsapp">WhatsApp (com DDD) <span class="obrig">*</span></label>
-          <input type="tel" id="whatsapp" name="whatsapp" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required>
-          <span class="msg-erro">WhatsApp inválido</span>
-        </div>
-        <div class="campo">
-          <label for="descricao">Conte o que está acontecendo (opcional)</label>
-          <textarea id="descricao" name="descricao" placeholder="Ex: as folhas começaram a ficar amareladas há 3 dias, está num vaso na varanda, rego 2x por semana..."></textarea>
-        </div>
-
-        <button type="submit" class="btn-enviar" id="btn-enviar">
-          📤 Enviar para análise
-        </button>
-
-        <div class="erro-msg" id="erro-msg"></div>
-      </form>
-    </div>
+    </form>
   </section>
 
   <section class="card">
@@ -248,7 +275,7 @@
       <h2>Como funciona</h2>
     </div>
     <ul class="passos">
-      <li><span class="num">1</span><span>Você <b>envia a foto</b> da flor pelo botão acima.</span></li>
+      <li><span class="num">1</span><span>Você <b>envia 2 fotos</b> da flor — uma de frente e outra do verso (atrás das folhas).</span></li>
       <li><span class="num">2</span><span>Nossa equipe <b>analisa</b> e identifica o que está afetando sua planta.</span></li>
       <li><span class="num">3</span><span>Você recebe o <b>diagnóstico e os cuidados</b> diretamente no seu WhatsApp.</span></li>
     </ul>
@@ -260,48 +287,28 @@
 <div class="sucesso-overlay" id="sucesso">
   <div class="sucesso-card">
     <div class="sucesso-icone">✓</div>
-    <h3>Foto recebida!</h3>
-    <p>Nossa equipe vai analisar a foto da sua flor e em breve entrar em contato pelo seu WhatsApp.</p>
-    <button type="button" class="ok" id="btn-ok">Enviar outra foto</button>
+    <h3>Fotos recebidas!</h3>
+    <p>Nossa equipe vai analisar as fotos da sua flor e em breve entrar em contato pelo seu WhatsApp.</p>
+    <button type="button" class="ok" id="btn-ok">Enviar de novo</button>
   </div>
 </div>
 
 <script>
   // ============= CONFIG =============
-  // Endpoint do FormSubmit — entrega no e-mail vinossauros@gmail.com.
-  // Primeira submissão dispara um e-mail de confirmação que precisa ser aceito 1x.
   const FORM_ENDPOINT = "https://formsubmit.co/vinossauros@gmail.com";
   const SUCCESS_URL = window.location.origin + window.location.pathname + "?ok=1";
 
-  // ============= NAVEGAÇÃO ENTRE MODOS =============
-  const opcoes = document.getElementById('opcoes');
-  const fotoPreview = document.getElementById('foto-preview');
-  const inputCamera = document.getElementById('input-camera');
-  const inputGaleria = document.getElementById('input-galeria');
+  // ============= ESTADO =============
+  const fotos = { frente: null, verso: null };
+  const TIPOS = ['frente','verso'];
 
-  let fotoDataUrl = null;
-
-  const mostrar = quem => {
-    opcoes.style.display = quem==='opcoes' ? 'flex' : 'none';
-    fotoPreview.classList.toggle('ativo', quem==='foto');
+  const atualizarBotao = () => {
+    document.getElementById('btn-enviar').disabled = !(fotos.frente && fotos.verso);
   };
 
-  // ============= ABRIR CÂMERA / GALERIA =============
-  // Usar input nativo é o mais confiável: no celular abre a câmera do sistema
-  // (capture="environment"); no desktop, abre o seletor de arquivos.
-  document.getElementById('btn-camera').addEventListener('click', () => inputCamera.click());
-  document.getElementById('btn-galeria').addEventListener('click', () => inputGaleria.click());
-  document.getElementById('voltar-foto').addEventListener('click', () => {
-    inputCamera.value = '';
-    inputGaleria.value = '';
-    fotoDataUrl = null;
-    mostrar('opcoes');
-  });
-
-  // ============= UPLOAD VIA INPUT =============
-  const lerFoto = file => {
+  // ============= LEITURA E REDIMENSIONAMENTO =============
+  const lerFoto = (file, tipo) => {
     if(!file) return;
-    // Redimensiona pra economizar peso no envio
     const img = new Image();
     const reader = new FileReader();
     reader.onload = ev => { img.src = ev.target.result; };
@@ -315,15 +322,45 @@
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      fotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      document.getElementById('foto-img').src = fotoDataUrl;
-      mostrar('foto');
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      fotos[tipo] = dataUrl;
+      document.getElementById('img-'+tipo).src = dataUrl;
+      document.getElementById('empty-'+tipo).hidden = true;
+      document.getElementById('filled-'+tipo).hidden = false;
+      document.getElementById('slot-'+tipo).classList.add('preenchido');
+      atualizarBotao();
     };
     reader.readAsDataURL(file);
   };
 
-  inputCamera.addEventListener('change', e => lerFoto(e.target.files && e.target.files[0]));
-  inputGaleria.addEventListener('change', e => lerFoto(e.target.files && e.target.files[0]));
+  // ============= EVENTOS DOS BOTÕES =============
+  document.querySelectorAll('.mini-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tipo = btn.dataset.tipo;
+      const acao = btn.dataset.acao;
+      const id = (acao === 'camera' ? 'cam-' : 'gal-') + tipo;
+      document.getElementById(id).click();
+    });
+  });
+
+  document.querySelectorAll('.trocar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tipo = btn.dataset.tipo;
+      fotos[tipo] = null;
+      document.getElementById('img-'+tipo).src = '';
+      document.getElementById('cam-'+tipo).value = '';
+      document.getElementById('gal-'+tipo).value = '';
+      document.getElementById('filled-'+tipo).hidden = true;
+      document.getElementById('empty-'+tipo).hidden = false;
+      document.getElementById('slot-'+tipo).classList.remove('preenchido');
+      atualizarBotao();
+    });
+  });
+
+  TIPOS.forEach(tipo => {
+    document.getElementById('cam-'+tipo).addEventListener('change', e => lerFoto(e.target.files && e.target.files[0], tipo));
+    document.getElementById('gal-'+tipo).addEventListener('change', e => lerFoto(e.target.files && e.target.files[0], tipo));
+  });
 
   // ============= MÁSCARA WHATSAPP =============
   document.getElementById('whatsapp').addEventListener('input', e => {
@@ -339,10 +376,8 @@
     const nome = document.getElementById('nome');
     const wpp = document.getElementById('whatsapp');
     [nome,wpp].forEach(el=>el.parentElement.classList.remove('has-erro'));
-
     if(nome.value.trim().length < 2){ nome.parentElement.classList.add('has-erro'); ok=false; }
-    const ds = (wpp.value||'').replace(/\D/g,'');
-    if(ds.length < 10){ wpp.parentElement.classList.add('has-erro'); ok=false; }
+    if((wpp.value||'').replace(/\D/g,'').length < 10){ wpp.parentElement.classList.add('has-erro'); ok=false; }
     return ok;
   };
 
@@ -358,8 +393,8 @@
     const erroEl = document.getElementById('erro-msg');
     erroEl.classList.remove('ativo');
 
-    if(!fotoDataUrl){
-      erroEl.textContent = 'Por favor, envie uma foto antes de continuar.';
+    if(!fotos.frente || !fotos.verso){
+      erroEl.textContent = 'Por favor, envie as 2 fotos (frente e verso) antes de continuar.';
       erroEl.classList.add('ativo');
       return;
     }
@@ -373,18 +408,18 @@
       const nome = document.getElementById('nome').value.trim();
       const whatsapp = document.getElementById('whatsapp').value.trim();
       const descricao = document.getElementById('descricao').value.trim();
+      const ts = Date.now();
 
-      const file = await dataUrlParaFile(
-        fotoDataUrl,
-        `flor-${Date.now()}.jpg`
-      );
+      const fileF = await dataUrlParaFile(fotos.frente, `flor-FRENTE-${ts}.jpg`);
+      const fileV = await dataUrlParaFile(fotos.verso, `flor-VERSO-${ts}.jpg`);
 
       const fd = new FormData();
       fd.append('Nome', nome);
       fd.append('WhatsApp', whatsapp);
       fd.append('Descricao', descricao || '(não informado)');
       fd.append('Data', new Date().toLocaleString('pt-BR', {timeZone:'America/Sao_Paulo'}));
-      fd.append('attachment', file, file.name);
+      fd.append('attachment', fileF, fileF.name);
+      fd.append('attachment', fileV, fileV.name);
       fd.append('_subject', `🌹 Nova foto de flor — ${nome}`);
       fd.append('_template', 'table');
       fd.append('_captcha', 'false');
@@ -402,16 +437,26 @@
     }
   });
 
+  // ============= LIMPAR PARA NOVA SUBMISSÃO =============
   document.getElementById('btn-ok').addEventListener('click', () => {
     document.getElementById('sucesso').classList.remove('ativo');
     document.getElementById('form-envio').reset();
-    fotoDataUrl = null;
-    document.getElementById('btn-enviar').disabled = false;
-    document.getElementById('btn-enviar').textContent = '📤 Enviar para análise';
-    mostrar('opcoes');
+    TIPOS.forEach(tipo => {
+      fotos[tipo] = null;
+      document.getElementById('img-'+tipo).src = '';
+      document.getElementById('cam-'+tipo).value = '';
+      document.getElementById('gal-'+tipo).value = '';
+      document.getElementById('filled-'+tipo).hidden = true;
+      document.getElementById('empty-'+tipo).hidden = false;
+      document.getElementById('slot-'+tipo).classList.remove('preenchido');
+    });
+    atualizarBotao();
+    const btn = document.getElementById('btn-enviar');
+    btn.textContent = '📤 Enviar para análise';
+    window.scrollTo({top:0, behavior:'smooth'});
   });
 
-  // Se voltou da confirmação do FormSubmit, mostra sucesso
+  // Volta da confirmação do FormSubmit
   if(window.location.search.includes('ok=1')){
     document.getElementById('sucesso').classList.add('ativo');
     history.replaceState({}, '', window.location.pathname);
